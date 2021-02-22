@@ -149,6 +149,26 @@ def get_categories():
     return render_template("categories.html", categories=categories)
 
 
+@app.route("/add_category", methods=["GET", "POST"])
+def add_category():
+    if request.method == "POST":
+        category = {
+            "category_name": request.form.get("category_name")
+        }
+        mongo.db.categories.insert_one(category)
+        flash("New Category Added")
+        return redirect(url_for("get_categories"))
+
+    return render_template("add_category.html")
+
+
+@app.route("/delete_category/<category_id>")
+def delete_category(category_id):
+    mongo.db.categories.remove({"_id": ObjectId(category_id)})
+    flash("Category Successfully Deleted")
+    return redirect(url_for("get_categories"))
+
+
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
             port=int(os.environ.get("PORT")),
